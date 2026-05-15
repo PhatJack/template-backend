@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import prisma from "../config/prisma";
+import { createUser as createUserRecord, listUsers as listUsersRecords } from "../repositories/user.repository";
 
 export async function listUsers(
   _req: Request,
@@ -7,9 +7,7 @@ export async function listUsers(
   next: NextFunction
 ): Promise<Response | void> {
   try {
-    const users = await prisma.user.findMany({
-      orderBy: { createdAt: "desc" }
-    });
+    const users = await listUsersRecords();
     return res.status(200).json({ success: true, data: users });
   } catch (error) {
     return next(error);
@@ -30,11 +28,14 @@ export async function createUser(
       });
     }
 
-    const created = await prisma.user.create({
-      data: { name, email }
-    });
+    const created = await createUserRecord({ name, email });
     return res.status(201).json({ success: true, data: created });
   } catch (error) {
     return next(error);
   }
 }
+
+export const UserController = {
+  listUsers,
+  createUser,
+};

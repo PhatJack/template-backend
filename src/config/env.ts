@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const databaseUrl =
-  process.env.DATABASE_URL || "mysql://root:password@localhost:3306/template_backend";
+  process.env.MONGODB_URI ||
+  process.env.DATABASE_URL ||
+  "mongodb://root:password@localhost:27017/template_backend";
 
 function parseDatabaseInfo(url: string): { host: string; name: string } {
   try {
@@ -23,7 +25,7 @@ function parseDatabaseInfo(url: string): { host: string; name: string } {
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 3000),
-  dbClient: "mysql",
+  dbClient: "mongodb",
   databaseUrl,
   database: parseDatabaseInfo(databaseUrl)
 };

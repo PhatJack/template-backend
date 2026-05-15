@@ -1,21 +1,28 @@
+import mongoose from "mongoose";
 import env from "./env";
-import prisma from "./prisma";
 
 type DbConnectionInfo = {
-  client: "mysql";
+  client: "mongodb";
   host: string;
   name: string;
 };
 
 export async function connectDb(): Promise<DbConnectionInfo> {
-  await prisma.$connect();
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(env.databaseUrl);
+  }
+
+  const { host, name } = mongoose.connection;
+
   return {
-    client: "mysql",
-    host: env.database.host,
-    name: env.database.name,
+    client: "mongodb",
+    host: host || env.database.host,
+    name: name || env.database.name
   };
 }
 
 export async function closeDb(): Promise<void> {
-  await prisma.$disconnect();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
 }

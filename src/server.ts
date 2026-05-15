@@ -7,7 +7,7 @@ async function startServer(): Promise<void> {
   console.log(`Database connected: ${db.client} (${db.host}/${db.name})`);
 
   const server = app.listen(env.port, () => {
-    console.log(`Server running on http://localhost:${env.port} (MySQL)`);
+    console.log(`Server running on http://localhost:${env.port} (MongoDB)`);
   });
 
   async function shutdown(signal: NodeJS.Signals): Promise<void> {

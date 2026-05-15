@@ -12,3 +12,7 @@ export function getHealth(_req: Request, res: Response): void {
     }
   });
 }
+
+export const HealthController = {
+  getHealth,
+};

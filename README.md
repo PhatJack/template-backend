@@ -1,11 +1,11 @@
 # template-backend
 
-Lightweight TypeScript REST API template using Express, MySQL, and Prisma.
+Lightweight TypeScript REST API template using Express and MongoDB.
 
 **Prerequisites:**
 - Node.js (16+ recommended)
 - A package manager: `pnpm` (recommended) or `npm`
-- MySQL if you plan to use a database (see `.env.example`)
+- MongoDB if you plan to use a database (see `.env.example`)
 
 **Quick start**
 
@@ -27,8 +27,7 @@ cp .env.example .env
 # (on Windows PowerShell) Copy-Item .env.example .env
 ```
 
-- Set `DATABASE_URL` in `.env` to your MySQL connection string.
-- Run `pnpm run prisma:migrate` to create/update the database tables in development.
+- Set `MONGODB_URI` in `.env` to your MongoDB connection string.
 
 3. Run the app
 
@@ -56,21 +55,18 @@ npm start
 
 **Available scripts** (from `package.json`)
 - `dev`: Start development server with `tsx watch src/server.ts`
-- `build`: Generate Prisma Client and compile TypeScript into `dist`
-- `prisma:generate`: Generate Prisma Client
-- `prisma:migrate`: Run Prisma migrations in development
+- `build`: Compile TypeScript into `dist`
 - `start`: Run `node dist/server.js`
 
 **Database notes**
 - Example environment settings are in `.env.example`.
-- To use MySQL locally quickly you can run:
+- To use MongoDB locally quickly you can run:
 
 ```bash
-docker run -d -p 3306:3306 --name template-mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=template_backend mysql:8
+docker run -d -p 27017:27017 --name template-mongo mongo:7
 ```
 
 **Where to look**
 - Server entry: `src/server.ts`
 - App setup: `src/app.ts`
-- Prisma schema: `prisma/schema.prisma`
 - Routes: `src/routes` and controllers in `src/controllers`

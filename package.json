@@ -1,28 +1,26 @@
 {
   "name": "template-backend",
   "version": "1.0.0",
-  "description": "TypeScript REST API template with Express, MySQL, and Prisma",
+  "description": "TypeScript REST API template with Express and MongoDB",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && tsc",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "build": "tsc",
     "start": "node dist/server.js"
   },
   "keywords": [
     "nodejs",
     "express",
     "rest-api",
-    "mysql",
-    "prisma"
+    "mongodb",
+    "mongoose"
   ],
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^7.8.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongoose": "^9.6.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
@@ -31,7 +29,6 @@
     "@types/node": "^25.8.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
-    "prisma": "^7.8.0",
     "tsx": "^4.22.0",
     "typescript": "^5.9.3"
   }
