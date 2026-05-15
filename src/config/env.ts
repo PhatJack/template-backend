@@ -1,0 +1,31 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const databaseUrl =
+  process.env.DATABASE_URL || "mysql://root:password@localhost:3306/template_backend";
+
+function parseDatabaseInfo(url: string): { host: string; name: string } {
+  try {
+    const parsed = new URL(url);
+    return {
+      host: parsed.host,
+      name: parsed.pathname.replace(/^\//, "") || "unknown"
+    };
+  } catch {
+    return {
+      host: "unknown",
+      name: "unknown"
+    };
+  }
+}
+
+const env = {
+  nodeEnv: process.env.NODE_ENV || "development",
+  port: Number(process.env.PORT || 3000),
+  dbClient: "mysql",
+  databaseUrl,
+  database: parseDatabaseInfo(databaseUrl)
+};
+
+export default env;
