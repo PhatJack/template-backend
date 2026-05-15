@@ -31,6 +31,5 @@ const userSchema = new Schema<UserInput>(
   }
 );
 
-userSchema.index({ email: 1 }, { unique: true });
 
 export const userModel = model<UserInput>("User", userSchema);

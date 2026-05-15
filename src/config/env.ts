@@ -4,7 +4,6 @@ dotenv.config();
 
 const databaseUrl =
   process.env.MONGODB_URI ||
-  process.env.DATABASE_URL ||
   "mongodb://root:password@localhost:27017/template_backend";
 
 function parseDatabaseInfo(url: string): { host: string; name: string } {
@@ -12,12 +11,12 @@ function parseDatabaseInfo(url: string): { host: string; name: string } {
     const parsed = new URL(url);
     return {
       host: parsed.host,
-      name: parsed.pathname.replace(/^\//, "") || "unknown"
+      name: parsed.pathname.replace(/^\//, "") || "unknown",
     };
   } catch {
     return {
       host: "unknown",
-      name: "unknown"
+      name: "unknown",
     };
   }
 }
@@ -27,7 +26,7 @@ const env = {
   port: Number(process.env.PORT || 3000),
   dbClient: "mongodb",
   databaseUrl,
-  database: parseDatabaseInfo(databaseUrl)
+  database: parseDatabaseInfo(databaseUrl),
 };
 
 export default env;

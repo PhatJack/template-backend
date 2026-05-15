@@ -32,3 +32,8 @@ export async function createUser(input: UserInput): Promise<UserResponse> {
 
   return toUserResponse(created.toObject() as unknown as UserRecord);
 }
+
+export async function getUserByEmail(email: string): Promise<UserResponse | null> {
+	const user = await userModel.findOne({ email }).lean<UserRecord | null>();
+	return user ? toUserResponse(user) : null;
+}
