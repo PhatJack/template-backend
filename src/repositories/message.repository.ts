@@ -28,6 +28,11 @@ export async function listByConversation(conversationId: string, limit = 50, ski
   return messages.map(toMessageResponse);
 }
 
+export async function getMessage(id: string): Promise<MessageResponse | null> {
+  const message = await MessageModel.findById(id).lean<MessageRecord | null>();
+  return message ? toMessageResponse(message) : null;
+}
+
 export async function createMessage(input: MessageInput): Promise<MessageResponse> {
   const created = await MessageModel.create(input);
   return toMessageResponse(created.toObject() as unknown as MessageRecord);

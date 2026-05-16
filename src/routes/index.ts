@@ -20,6 +20,7 @@ router.delete("/conversations/:id", ConversationController.deleteConversationHan
 // Messages
 router.get("/messages", MessageController.listMessages);
 router.post("/messages", MessageController.createMessageHandler);
+router.post("/messages/reply", MessageController.generateMessageHandler);
 
 // Files
 router.get("/files", FileController.listFiles);

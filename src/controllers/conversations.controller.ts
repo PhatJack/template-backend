@@ -6,6 +6,7 @@ import {
   updateConversation,
   deleteConversationCascade,
 } from "../repositories/conversation.repository";
+import { generateTitleConversation } from "../services/gemini.service";
 
 export async function listConversations(
   req: Request,
@@ -42,10 +43,17 @@ export async function createConversationHandler(
   next: NextFunction
 ): Promise<Response | void> {
   try {
-    const { title, userId } = req.body;
-    if (!userId) {
-      return res.status(400).json({ success: false, message: "userId is required" });
+    const { userId, prompt } = req.body;
+    const normalizedPrompt = typeof prompt === "string" ? prompt.trim() : "";
+
+    if (!userId || !normalizedPrompt) {
+      return res.status(400).json({
+        success: false,
+        message: "userId and prompt are required",
+      });
     }
+
+    const title = await generateTitleConversation(normalizedPrompt);
     const created = await createConversation({ title, userId });
     return res.status(201).json({ success: true, data: created });
   } catch (error) {
