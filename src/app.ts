@@ -2,14 +2,21 @@ import express, {
   type ErrorRequestHandler,
   type NextFunction,
   type Request,
-  type Response
+  type Response,
 } from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 import apiRoutes from "./routes";
-
+import cors from "cors";
+import env from "./config/env";
 const app = express();
 
+app.use(
+  cors({
+    origin: env.corsOrigin,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.get("/api-docs.json", (_req: Request, res: Response) => {
   res.status(200).json(swaggerSpec);
@@ -26,12 +33,12 @@ const errorHandler: ErrorRequestHandler = (
   err: HttpError,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ) => {
   const status = err.status || 500;
   res.status(status).json({
     success: false,
-    message: err.message || "Internal server error"
+    message: err.message || "Internal server error",
   });
 };
 

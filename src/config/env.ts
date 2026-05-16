@@ -29,6 +29,12 @@ const env = {
   database: parseDatabaseInfo(databaseUrl),
   geminiApiKey: process.env.GEMINI_API_KEY || "",
   geminiModel: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  corsOrigin: process.env.CORS_ORIGIN
+    ? JSON.parse(process.env.CORS_ORIGIN)
+    : [
+        "http://localhost:3000",
+        "http://localhost:5173",
+      ],
 };
 
 export default env;
