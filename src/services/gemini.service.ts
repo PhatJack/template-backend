@@ -117,11 +117,16 @@ export async function generateTitleConversation(
     contents: `Generate a concise and descriptive title (max 5 words) for a conversation based on this message: ${prompt}`,
     config: {
       temperature: 0.7,
+      systemInstruction:
+        "You are a title generator. Return ONLY the raw text of the title. Do not include quotes, markdown, prefixes, or any conversational filler.",
     },
   });
+
   const title = response.text?.trim();
+
   if (!title) {
     throw createHttpError("Failed to generate conversation title", 502);
   }
+
   return title;
 }
