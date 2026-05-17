@@ -35,6 +35,8 @@ const env = {
         "http://localhost:3000",
         "http://localhost:5173",
       ],
+	jwtSecret: process.env.JWT_SECRET || "default_secret",
+	jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
 };
 
 export default env;

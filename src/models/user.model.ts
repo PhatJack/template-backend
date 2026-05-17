@@ -3,6 +3,7 @@ import { Schema, model, type Types } from "mongoose";
 export type UserInput = {
   email: string;
   name?: string | null;
+  password: string;
 };
 
 export type UserRecord = UserInput & {
@@ -23,6 +24,10 @@ const userSchema = new Schema<UserInput>(
     name: {
       type: String,
       default: null
+    },
+    password: {
+      type: String,
+      required: true
     }
   },
   {

@@ -4,12 +4,18 @@ import { UserController } from "../controllers/users.controller";
 import { ConversationController } from "../controllers/conversations.controller";
 import { MessageController } from "../controllers/messages.controller";
 import { FileController } from "../controllers/files.controller";
+import { AuthController } from "../controllers/auth.controller";
+import { authenticateToken } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
 router.get("/health", HealthController.getHealth);
 router.get("/users", UserController.listUsers);
 router.post("/users", UserController.createUser);
+
+router.post("/auth/register", AuthController.register);
+router.post("/auth/login", AuthController.login);
+router.get("/auth/me", authenticateToken, AuthController.me);
 
 // Conversations
 router.get("/conversations", ConversationController.listConversations);

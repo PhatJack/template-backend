@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { userModel, type UserInput, type UserRecord } from "../models/user.model";
 
 export type UserResponse = {
@@ -25,15 +26,23 @@ export async function listUsers(): Promise<UserResponse[]> {
 }
 
 export async function createUser(input: UserInput): Promise<UserResponse> {
+  const hashedPassword = createHash("sha256").update(input.password).digest("hex");
+
   const created = await userModel.create({
     email: input.email,
-    name: input.name ?? null
+    name: input.name ?? null,
+    password: hashedPassword
   });
 
   return toUserResponse(created.toObject() as unknown as UserRecord);
 }
 
-export async function getUserByEmail(email: string): Promise<UserResponse | null> {
-	const user = await userModel.findOne({ email }).lean<UserRecord | null>();
-	return user ? toUserResponse(user) : null;
+export async function getUserByEmail(email: string): Promise<UserRecord | null> {
+  return userModel.findOne({ email }).lean<UserRecord | null>();
+}
+
+export async function getUserById(id: string): Promise<UserResponse | null> {
+  const user = await userModel.findById(id).lean<UserRecord | null>();
+
+  return user ? toUserResponse(user) : null;
 }

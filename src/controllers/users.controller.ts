@@ -20,15 +20,15 @@ export async function createUser(
   next: NextFunction
 ): Promise<Response | void> {
   try {
-    const { name, email } = req.body;
-    if (!name || !email) {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Both name and email are required"
+        message: "Name, email, and password are required"
       });
     }
 
-    const created = await createUserRecord({ name, email });
+    const created = await createUserRecord({ name, email, password });
     return res.status(201).json({ success: true, data: created });
   } catch (error) {
     return next(error);

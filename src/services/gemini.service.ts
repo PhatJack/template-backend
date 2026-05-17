@@ -98,6 +98,8 @@ export async function* streamGeminiReply(
   for await (const chunk of response) {
     const text = chunk.text;
     if (text) {
+      // * yield được dùng trong generator function để trả về một giá trị tạm thời và
+      // * tạm dừng thực thi cho đến khi giá trị tiếp theo được yêu cầu.
       yield text;
     }
   }
