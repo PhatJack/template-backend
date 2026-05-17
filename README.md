@@ -3,6 +3,7 @@
 Lightweight TypeScript REST API template using Express and MongoDB.
 
 **Prerequisites:**
+
 - Node.js (16+ recommended)
 - A package manager: `pnpm` (recommended) or `npm`
 - MongoDB if you plan to use a database (see `.env.example`)
@@ -49,24 +50,18 @@ npm start
 ```
 
 **API docs**
+
 - Swagger UI: `http://localhost:3000/api-docs`
 - Swagger UI alias: `http://localhost:3000/docs`
 - OpenAPI JSON: `http://localhost:3000/api-docs.json`
 
 **Available scripts** (from `package.json`)
+
 - `dev`: Start development server with `tsx watch src/server.ts`
 - `build`: Compile TypeScript into `dist`
 - `start`: Run `node dist/server.js`
 
 **Database notes**
+
 - Example environment settings are in `.env.example`.
 - To use MongoDB locally quickly you can run:
-
-```bash
-docker run -d -p 27017:27017 --name template-mongo mongo:7
-```
-
-**Where to look**
-- Server entry: `src/server.ts`
-- App setup: `src/app.ts`
-- Routes: `src/routes` and controllers in `src/controllers`
