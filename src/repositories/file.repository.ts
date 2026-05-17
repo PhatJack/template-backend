@@ -12,7 +12,7 @@ export type FileResponse = {
   createdAt: Date;
 };
 
-function toFileResponse(f: FileRecord): FileResponse {
+export function toFileResponse(f: FileRecord): FileResponse {
   return {
     id: f._id.toString(),
     conversationId: f.conversationId.toString(),
@@ -28,6 +28,11 @@ function toFileResponse(f: FileRecord): FileResponse {
 
 export async function listByConversation(conversationId: string): Promise<FileResponse[]> {
   const files = await FileModel.find({ conversationId }).lean<FileRecord[]>();
+  return files.map(toFileResponse);
+}
+
+export async function listByMessage(messageId: string): Promise<FileResponse[]> {
+  const files = await FileModel.find({ messageId }).lean<FileRecord[]>();
   return files.map(toFileResponse);
 }
 

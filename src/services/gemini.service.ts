@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, type File as GeminiFile, type Part } from "@google/genai";
 import env from "../config/env";
 
 type HttpError = Error & {
@@ -41,6 +41,10 @@ function createHttpError(message: string, status: number): HttpError {
   return error;
 }
 
+function isHttpError(error: unknown): error is HttpError {
+  return error instanceof Error && typeof (error as HttpError).status === "number";
+}
+
 function getClient(): GoogleGenAI {
   if (!env.geminiApiKey) {
     throw createHttpError("GEMINI_API_KEY is required", 500);
@@ -57,20 +61,145 @@ function getGeminiModel(): string {
 export type GeminiReply = {
   model: string;
   content: string;
+  files?: GeminiUploadedFile[];
 };
+
+export type GeminiAttachment = {
+  path: string;
+  mimeType: string;
+};
+
+export type GeminiUploadedFile = {
+  name: string;
+  uri: string;
+  mimeType: string;
+};
+
+export type GeminiFileReference = {
+  uri: string;
+  mimeType: string;
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function waitForActiveFile(file: GeminiFile): Promise<GeminiFile> {
+  if (!file.name) {
+    throw createHttpError("Gemini file upload did not return a file name", 502);
+  }
+
+  let current = file;
+
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    if (current.state === "ACTIVE" || !current.state) {
+      return current;
+    }
+
+    if (current.state === "FAILED") {
+      throw createHttpError(
+        current.error?.message || "Gemini failed to process uploaded file",
+        502,
+      );
+    }
+
+    await sleep(1000);
+    current = await getClient().files.get({ name: file.name });
+  }
+
+  throw createHttpError("Gemini file processing timed out", 504);
+}
+
+export async function uploadAttachmentToGemini(
+  attachment: GeminiAttachment,
+): Promise<GeminiUploadedFile> {
+  let activeFile: GeminiFile;
+
+  try {
+    const uploaded = await getClient().files.upload({
+      file: attachment.path,
+      config: {
+        mimeType: attachment.mimeType,
+      },
+    });
+    activeFile = await waitForActiveFile(uploaded);
+  } catch (error) {
+    if (isHttpError(error)) {
+      throw error;
+    }
+
+    throw createHttpError(
+      `Gemini rejected or failed to upload file: ${
+        error instanceof Error ? error.message : "Unknown upload error"
+      }`,
+      502,
+    );
+  }
+
+  if (!activeFile.name || !activeFile.uri || !activeFile.mimeType) {
+    throw createHttpError("Gemini returned incomplete file metadata", 502);
+  }
+
+  return {
+    name: activeFile.name,
+    uri: activeFile.uri,
+    mimeType: activeFile.mimeType,
+  };
+}
+
+function createGeminiContents(
+  prompt: string,
+  files: GeminiFileReference[],
+) {
+  if (files.length === 0) {
+    return prompt;
+  }
+
+  return [
+    {
+      role: "user",
+      parts: [
+        { text: prompt },
+        ...files.map<Part>((file) => ({
+          fileData: {
+            fileUri: file.uri,
+            mimeType: file.mimeType,
+          },
+        })),
+      ],
+    },
+  ];
+}
 
 export async function generateGeminiReply(
   prompt: string,
+  attachments: GeminiAttachment[] = [],
 ): Promise<GeminiReply> {
-  const response = await getClient().models.generateContent({
-    model: getGeminiModel(),
-    contents: prompt,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.7,
-      maxOutputTokens: 1000,
-    },
-  });
+  const uploadedFiles = attachments.length
+    ? await Promise.all(attachments.map(uploadAttachmentToGemini))
+    : [];
+  const contents = createGeminiContents(prompt, uploadedFiles);
+
+  let response: Awaited<
+    ReturnType<ReturnType<typeof getClient>["models"]["generateContent"]>
+  >;
+
+  try {
+    response = await getClient().models.generateContent({
+      model: getGeminiModel(),
+      contents,
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+      },
+    });
+  } catch (error) {
+    throw createHttpError(
+      `Gemini failed to generate a response${
+        uploadedFiles.length ? " with uploaded file attachments" : ""
+      }: ${error instanceof Error ? error.message : "Unknown generation error"}`,
+      502,
+    );
+  }
 
   const content = response.text?.trim();
   if (!content) {
@@ -80,15 +209,18 @@ export async function generateGeminiReply(
   return {
     model: getGeminiModel(),
     content,
+    files: uploadedFiles,
   };
 }
 
 export async function* streamGeminiReply(
   prompt: string,
+  files: GeminiFileReference[] = [],
 ): AsyncGenerator<string> {
+  const contents = createGeminiContents(prompt, files);
   const response = await getClient().models.generateContentStream({
     model: getGeminiModel(),
-    contents: prompt,
+    contents,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
       temperature: 0.7,

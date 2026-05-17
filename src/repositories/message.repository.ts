@@ -1,4 +1,10 @@
-import { MessageModel, type MessageRecord, type MessageInput } from "../models/message.model";
+import { FileModel, FileRecord } from "@/models/file.model";
+import {
+  MessageModel,
+  type MessageRecord,
+  type MessageInput,
+} from "../models/message.model";
+import { FileResponse, toFileResponse } from "./file.repository";
 
 export type MessageResponse = {
   id: string;
@@ -14,18 +20,50 @@ function toMessageResponse(m: MessageRecord): MessageResponse {
     conversationId: m.conversationId.toString(),
     role: m.role,
     content: m.content,
-    createdAt: m.createdAt
+    createdAt: m.createdAt,
   };
 }
 
-export async function listByConversation(conversationId: string, limit = 50, skip = 0): Promise<MessageResponse[]> {
+export async function listByConversation(
+  conversationId: string,
+  limit = 50,
+  skip = 0,
+): Promise<MessageResponse[]> {
   const messages = await MessageModel.find({ conversationId })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
     .lean<MessageRecord[]>();
 
-  return messages.map(toMessageResponse);
+  const messageIds = messages.map((m) => m._id);
+
+  const files = await FileModel.find({
+    messageId: { $in: messageIds },
+  })
+    .sort({ createdAt: 1 })
+    .lean<FileRecord[]>();
+
+  const filesByMessageId = files.reduce<Record<string, FileResponse[]>>(
+    (acc, file) => {
+      if (!file.messageId) return acc;
+
+      const messageId = String(file.messageId);
+
+      if (!acc[messageId]) {
+        acc[messageId] = [];
+      }
+
+      acc[messageId].push(toFileResponse(file));
+
+      return acc;
+    },
+    {},
+  );
+
+  return messages.map((message) => ({
+    ...toMessageResponse(message),
+    files: filesByMessageId[String(message._id)] ?? [],
+  }));
 }
 
 export async function getMessage(id: string): Promise<MessageResponse | null> {
@@ -33,7 +71,9 @@ export async function getMessage(id: string): Promise<MessageResponse | null> {
   return message ? toMessageResponse(message) : null;
 }
 
-export async function createMessage(input: MessageInput): Promise<MessageResponse> {
+export async function createMessage(
+  input: MessageInput,
+): Promise<MessageResponse> {
   const created = await MessageModel.create(input);
   return toMessageResponse(created.toObject() as unknown as MessageRecord);
 }

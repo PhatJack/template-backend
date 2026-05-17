@@ -18,15 +18,21 @@ export type FileRecord = FileInput & {
 
 const fileSchema = new Schema<FileInput>(
   {
-    conversationId: { type: Schema.Types.ObjectId, ref: "Conversation", required: true },
+    conversationId: {
+      type: Schema.Types.ObjectId,
+      ref: "Conversation",
+      required: true,
+    },
     messageId: { type: Schema.Types.ObjectId, ref: "Message", default: null },
     originalName: { type: String, required: true },
     fileName: { type: String, required: true },
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
-    url: { type: String, required: true }
+    url: { type: String, required: true },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
+
+fileSchema.index({ messageId: 1, conversationId: 1, createdAt: -1 });
 
 export const FileModel = model<FileInput>("File", fileSchema);

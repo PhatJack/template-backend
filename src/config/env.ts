@@ -6,6 +6,8 @@ const databaseUrl =
   process.env.MONGODB_URI ||
   "mongodb://root:password@localhost:27017/template_backend";
 
+const uploadMaxFileSizeMb = Number(process.env.UPLOAD_MAX_FILE_SIZE_MB || 20);
+
 function parseDatabaseInfo(url: string): { host: string; name: string } {
   try {
     const parsed = new URL(url);
@@ -37,6 +39,8 @@ const env = {
       ],
 	jwtSecret: process.env.JWT_SECRET || "default_secret",
 	jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
+  uploadMaxFileSizeMb,
+  uploadMaxFileSizeBytes: uploadMaxFileSizeMb * 1024 * 1024,
 };
 
 export default env;

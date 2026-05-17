@@ -6,6 +6,7 @@ import { MessageController } from "../controllers/messages.controller";
 import { FileController } from "../controllers/files.controller";
 import { AuthController } from "../controllers/auth.controller";
 import { authenticateToken } from "../middlewares/auth.middleware";
+import { uploadMessageFiles } from "../middlewares/upload.middleware";
 
 const router = express.Router();
 
@@ -27,11 +28,15 @@ router.delete("/conversations/:id", ConversationController.deleteConversationHan
 router.get("/messages", MessageController.listMessages);
 router.post("/messages", MessageController.createMessageHandler);
 router.get("/messages/reply/stream", MessageController.streamMessageHandler);
-router.post("/messages/reply", MessageController.generateMessageHandler);
+router.post(
+  "/messages/reply",
+  uploadMessageFiles,
+  MessageController.generateMessageHandler,
+);
 
 // Files
 router.get("/files", FileController.listFiles);
-router.post("/files", FileController.createFileHandler);
+router.post("/files", uploadMessageFiles, FileController.createFileHandler);
 router.delete("/files/:id", FileController.deleteFileHandler);
 
 export default router;

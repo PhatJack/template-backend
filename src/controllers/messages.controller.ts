@@ -1,14 +1,20 @@
 import type { NextFunction, Request, Response } from "express";
+import fs from "node:fs/promises";
 import {
   listByConversation,
   createMessage,
   getMessage,
 } from "../repositories/message.repository";
+import { createFile, listByMessage } from "../repositories/file.repository";
 import {
   generateGeminiReply,
   getGeminiReplyModel,
   streamGeminiReply,
 } from "../services/gemini.service";
+import {
+  getSupportedGeminiMimeTypes,
+  isSupportedGeminiMimeType,
+} from "../utils/gemini-file-types";
 
 function sendSseEvent(
   res: Response,
@@ -17,6 +23,14 @@ function sendSseEvent(
 ): void {
   res.write(`event: ${event}\n`);
   res.write(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+function getUploadedFiles(req: Request): Express.Multer.File[] {
+  return Array.isArray(req.files) ? req.files : [];
+}
+
+async function cleanupUploadedFiles(files: Express.Multer.File[]): Promise<void> {
+  await Promise.allSettled(files.map((file) => fs.unlink(file.path)));
 }
 
 export async function listMessages(
@@ -64,6 +78,8 @@ export async function generateMessageHandler(
   res: Response,
   next: NextFunction,
 ): Promise<Response | void> {
+  const uploadedFiles = getUploadedFiles(req);
+
   try {
     const { messageId } = req.body;
 
@@ -90,12 +106,45 @@ export async function generateMessageHandler(
       });
     }
 
-    const geminiReply = await generateGeminiReply(sourceMessage.content);
+    const unsupportedFile = uploadedFiles.find(
+      (file) => !isSupportedGeminiMimeType(file.mimetype),
+    );
+
+    if (unsupportedFile) {
+      return res.status(415).json({
+        success: false,
+        message: `Unsupported file type "${unsupportedFile.mimetype || "unknown"}" for "${unsupportedFile.originalname}". Supported MIME types: ${getSupportedGeminiMimeTypes().join(", ")}`,
+      });
+    }
+
+    const geminiReply = await generateGeminiReply(
+      sourceMessage.content,
+      uploadedFiles.map((file) => ({
+        path: file.path,
+        mimeType: file.mimetype,
+      })),
+    );
     const assistantMessage = await createMessage({
       conversationId: sourceMessage.conversationId,
       role: "ASSISTANT",
       content: geminiReply.content,
     });
+
+    if (geminiReply.files?.length) {
+      await Promise.all(
+        uploadedFiles.map((file, index) =>
+          createFile({
+            conversationId: sourceMessage.conversationId,
+            messageId: sourceMessage.id,
+            originalName: file.originalname,
+            fileName: file.filename,
+            mimeType: file.mimetype,
+            size: file.size,
+            url: geminiReply.files?.[index]?.uri || file.filename,
+          }),
+        ),
+      );
+    }
 
     return res.status(201).json({
       success: true,
@@ -107,6 +156,8 @@ export async function generateMessageHandler(
     });
   } catch (error) {
     return next(error);
+  } finally {
+    await cleanupUploadedFiles(uploadedFiles);
   }
 }
 
@@ -154,7 +205,15 @@ export async function streamMessageHandler(
     const chunks: string[] = [];
 
     try {
-      for await (const text of streamGeminiReply(sourceMessage.content)) {
+      const sourceFiles = await listByMessage(sourceMessage.id);
+
+      for await (const text of streamGeminiReply(
+        sourceMessage.content,
+        sourceFiles.map((file) => ({
+          uri: file.url,
+          mimeType: file.mimeType,
+        })),
+      )) {
         if (clientClosed || res.writableEnded) {
           return;
         }
