@@ -1,5 +1,5 @@
 import { GoogleGenAI, type File as GeminiFile, type Part } from "@google/genai";
-import env from "../config/env";
+import env from "../config/env.js";
 
 type HttpError = Error & {
   status?: number;

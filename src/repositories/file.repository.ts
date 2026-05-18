@@ -1,4 +1,4 @@
-import { FileModel, type FileRecord, type FileInput } from "../models/file.model";
+import { FileModel, type FileRecord, type FileInput } from "../models/file.model.js";
 
 export type FileResponse = {
   id: string;

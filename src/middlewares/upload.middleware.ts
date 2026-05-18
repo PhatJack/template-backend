@@ -3,7 +3,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import env from "@/config/env";
+import env from "../config/env.js";
 
 export const uploadTempDir = path.join(process.cwd(), "uploads", "tmp");
 

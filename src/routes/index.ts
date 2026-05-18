@@ -1,12 +1,12 @@
 import express from "express";
-import { HealthController } from "../controllers/health.controller";
-import { UserController } from "../controllers/users.controller";
-import { ConversationController } from "../controllers/conversations.controller";
-import { MessageController } from "../controllers/messages.controller";
-import { FileController } from "../controllers/files.controller";
-import { AuthController } from "../controllers/auth.controller";
-import { authenticateToken } from "../middlewares/auth.middleware";
-import { uploadMessageFiles } from "../middlewares/upload.middleware";
+import { HealthController } from "../controllers/health.controller.js";
+import { UserController } from "../controllers/users.controller.js";
+import { ConversationController } from "../controllers/conversations.controller.js";
+import { MessageController } from "../controllers/messages.controller.js";
+import { FileController } from "../controllers/files.controller.js";
+import { AuthController } from "../controllers/auth.controller.js";
+import { authenticateToken } from "../middlewares/auth.middleware.js";
+import { uploadMessageFiles } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 

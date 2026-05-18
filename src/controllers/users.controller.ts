@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { createUser as createUserRecord, listUsers as listUsersRecords } from "../repositories/user.repository";
+import { createUser as createUserRecord, listUsers as listUsersRecords } from "../repositories/user.repository.js";
 
 export async function listUsers(
   _req: Request,

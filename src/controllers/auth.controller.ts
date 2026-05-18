@@ -4,8 +4,8 @@ import {
   createUser,
   getUserByEmail,
   getUserById,
-} from "../repositories/user.repository";
-import { signAccessToken } from "@/utils/jwt";
+} from "../repositories/user.repository.js";
+import { signAccessToken } from "../utils/jwt.js";
 
 function hashPassword(password: string) {
   return createHash("sha256").update(password).digest("hex");

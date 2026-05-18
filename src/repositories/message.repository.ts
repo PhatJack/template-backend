@@ -1,10 +1,10 @@
-import { FileModel, FileRecord } from "@/models/file.model";
+import { FileModel, FileRecord } from "../models/file.model.js";
 import {
   MessageModel,
   type MessageRecord,
   type MessageInput,
-} from "../models/message.model";
-import { FileResponse, toFileResponse } from "./file.repository";
+} from "../models/message.model.js";
+import { FileResponse, toFileResponse } from "./file.repository.js";
 
 export type MessageResponse = {
   id: string;

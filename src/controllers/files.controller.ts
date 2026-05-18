@@ -4,12 +4,12 @@ import {
   listByConversation,
   createFile,
   deleteFile,
-} from "../repositories/file.repository";
-import { uploadAttachmentToGemini } from "../services/gemini.service";
+} from "../repositories/file.repository.js";
+import { uploadAttachmentToGemini } from "../services/gemini.service.js";
 import {
   getSupportedGeminiMimeTypes,
   isSupportedGeminiMimeType,
-} from "../utils/gemini-file-types";
+} from "../utils/gemini-file-types.js";
 
 function getUploadedFiles(req: Request): Express.Multer.File[] {
   return Array.isArray(req.files) ? req.files : [];

@@ -5,10 +5,10 @@ import express, {
   type Response,
 } from "express";
 import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./config/swagger";
-import apiRoutes from "./routes";
+import swaggerSpec from "./config/swagger.js";
+import apiRoutes from "./routes/index.js";
 import cors from "cors";
-import env from "./config/env";
+import env from "./config/env.js";
 const app = express();
 
 app.use(

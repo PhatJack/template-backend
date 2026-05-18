@@ -4,17 +4,17 @@ import {
   listByConversation,
   createMessage,
   getMessage,
-} from "../repositories/message.repository";
-import { createFile, listByMessage } from "../repositories/file.repository";
+} from "../repositories/message.repository.js";
+import { createFile, listByMessage } from "../repositories/file.repository.js";
 import {
   generateGeminiReply,
   getGeminiReplyModel,
   streamGeminiReply,
-} from "../services/gemini.service";
+} from "../services/gemini.service.js";
 import {
   getSupportedGeminiMimeTypes,
   isSupportedGeminiMimeType,
-} from "../utils/gemini-file-types";
+} from "../utils/gemini-file-types.js";
 
 function sendSseEvent(
   res: Response,

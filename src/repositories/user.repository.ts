@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { userModel, type UserInput, type UserRecord } from "../models/user.model";
+import { userModel, type UserInput, type UserRecord } from "../models/user.model.js";
 
 export type UserResponse = {
   id: string;

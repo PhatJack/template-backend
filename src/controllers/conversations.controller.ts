@@ -5,8 +5,8 @@ import {
   createConversation,
   updateConversation,
   deleteConversationCascade,
-} from "../repositories/conversation.repository";
-import { generateTitleConversation } from "../services/gemini.service";
+} from "../repositories/conversation.repository.js";
+import { generateTitleConversation } from "../services/gemini.service.js";
 
 export async function listConversations(
   req: Request,

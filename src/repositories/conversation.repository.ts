@@ -3,9 +3,9 @@ import {
   ConversationModel,
   type ConversationRecord,
   type ConversationInput,
-} from "../models/conversation.model";
-import { MessageModel } from "../models/message.model";
-import { FileModel } from "../models/file.model";
+} from "../models/conversation.model.js";
+import { MessageModel } from "../models/message.model.js";
+import { FileModel } from "../models/file.model.js";
 
 export type ConversationResponse = {
   id: string;
