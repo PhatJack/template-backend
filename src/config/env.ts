@@ -1,12 +1,41 @@
 import dotenv from "dotenv";
 
-dotenv.config();
+// Render injects environment variables at runtime, so missing .env file is normal.
+// quiet avoids misleading logs like "injected env (0) from .env" in production.
+dotenv.config({ quiet: true });
 
 const databaseUrl =
   process.env.MONGODB_URI ||
   "mongodb://root:password@localhost:27017/template_backend";
 
 const uploadMaxFileSizeMb = Number(process.env.UPLOAD_MAX_FILE_SIZE_MB || 20);
+
+function parseCorsOrigin(value: string | undefined): string[] {
+  if (!value) {
+    return ["http://localhost:3000", "http://localhost:5173"];
+  }
+
+  const trimmed = value.trim();
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) {
+      return parsed.map(String);
+    }
+
+    if (typeof parsed === "string") {
+      return [parsed];
+    }
+  } catch {
+    // Support comma-separated or single origin values from hosting dashboards.
+    return trimmed
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean);
+  }
+
+  return ["http://localhost:3000", "http://localhost:5173"];
+}
 
 function parseDatabaseInfo(url: string): { host: string; name: string } {
   try {
@@ -31,12 +60,7 @@ const env = {
   database: parseDatabaseInfo(databaseUrl),
   geminiApiKey: process.env.GEMINI_API_KEY || "",
   geminiModel: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-  corsOrigin: process.env.CORS_ORIGIN
-    ? JSON.parse(process.env.CORS_ORIGIN)
-    : [
-        "http://localhost:3000",
-        "http://localhost:5173",
-      ],
+  corsOrigin: parseCorsOrigin(process.env.CORS_ORIGIN),
 	jwtSecret: process.env.JWT_SECRET || "default_secret",
 	jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   uploadMaxFileSizeMb,
