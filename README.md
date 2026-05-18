@@ -1,67 +1,114 @@
-# template-backend
+# 🚀 Hướng Dẫn Chạy Backend
 
-Lightweight TypeScript REST API template using Express and MongoDB.
+Backend được xây dựng bằng **TypeScript**, **Express.js** và **MongoDB**.
 
-**Prerequisites:**
+---
 
-- Node.js (16+ recommended)
-- A package manager: `pnpm` (recommended) or `npm`
-- MongoDB if you plan to use a database (see `.env.example`)
+## 📋 Yêu Cầu Hệ Thống
 
-**Quick start**
+Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt:
 
-1. Install dependencies
+- **Node.js** (phiên bản 18 hoặc cao hơn)
+- **Package Manager**: chọn một trong pnpm/npm/yarn
+- **MongoDB** (nếu sử dụng cơ sở dữ liệu)
+
+### 1. **Node.js** (phiên bản 18+)
+
+- Tải từ: https://nodejs.org/
+
+### 2. Chọn Package Manager
+
+Bạn có thể sử dụng một trong ba package manager sau:
+
+#### **pnpm** (phiên bản 8+) - KHUYẾN NGHỊ
 
 ```bash
-# with pnpm (recommended)
-pnpm install
+npm install -g pnpm
+pnpm --version
+```
 
-# or with npm
+#### **npm** (phiên bản 9+) - Mặc định với Node.js
+
+```bash
+npm --version
+```
+
+#### **yarn** (phiên bản 3+)
+
+```bash
+npm install -g yarn
+yarn --version
+```
+
+### Kiểm Tra Cài Đặt
+
+```bash
+node --version
+pnpm --version  # hoặc: npm --version, yarn --version
+```
+
+---
+
+## 🚀 Hướng Dẫn Nhanh Chạy Backend
+
+### Bước 1: Cài Đặt Thư Viện
+
+Từ thư mục `template-backend`:
+
+**Với pnpm (khuyến nghị):**
+
+```bash
+pnpm install
+```
+
+**Với npm:**
+
+```bash
 npm install
 ```
 
-2. Configure environment
+**Với yarn:**
 
 ```bash
-# copy example env and edit values as needed
+yarn install
+```
+
+### Bước 2: Cấu Hình Biến Môi Trường
+
+1. **Tạo file `.env`** từ file example:
+
+**Với Linux/macOS:**
+
+```bash
 cp .env.example .env
-# (on Windows PowerShell) Copy-Item .env.example .env
 ```
 
-- Set `MONGODB_URI` in `.env` to your MongoDB connection string.
-
-3. Run the app
+**Với Windows PowerShell:**
 
 ```bash
-# Development (auto-restarts with tsx)
-pnpm run dev
-# or
-npm run dev
-
-# Build
-pnpm run build
-# or
-npm run build
-
-# Production (runs compiled dist/server.js)
-pnpm start
-# or
-npm start
+Copy-Item .env.example .env
 ```
 
-**API docs**
+2. **Chỉnh sửa file `.env`** và điền các giá trị cần thiết
 
-- Swagger UI: `http://localhost:3000/api-docs`
-- Swagger UI alias: `http://localhost:3000/docs`
-- OpenAPI JSON: `http://localhost:3000/api-docs.json`
+## ▶️ Chạy Ứng Dụng Backend
 
-**Available scripts** (from `package.json`)
+**Với pnpm:**
 
-- `dev`: Start development server with `tsx watch src/server.ts`
-- `build`: Compile TypeScript into `dist`
-- `start`: Run `node dist/server.js`
+```bash
+pnpm run dev
+```
 
-**Database notes**
+**Với npm:**
 
-- Example environment settings are in `.env.example`.
-- To use MongoDB locally quickly you can run:
+```bash
+npm run dev
+```
+
+**Với yarn:**
+
+```bash
+yarn dev
+```
+
+Xong! 🎉 Backend sẽ chạy tại **http://localhost:3000**
