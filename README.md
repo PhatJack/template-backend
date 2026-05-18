@@ -20,7 +20,7 @@ Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt:
 
 Bạn có thể sử dụng một trong ba package manager sau:
 
-#### **pnpm** (phiên bản 8+) - KHUYẾN NGHỊ
+#### **pnpm** (phiên bản 10+) - KHUYẾN NGHỊ
 
 ```bash
 npm install -g pnpm
