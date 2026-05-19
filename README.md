@@ -6,109 +6,91 @@ Backend được xây dựng bằng **TypeScript**, **Express.js** và **MongoDB
 
 ## 📋 Yêu Cầu Hệ Thống
 
-Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt:
-
-- **Node.js** (phiên bản 18 hoặc cao hơn)
-- **Package Manager**: chọn một trong pnpm/npm/yarn
-- **MongoDB** (nếu sử dụng cơ sở dữ liệu)
-
-### 1. **Node.js** (phiên bản 18+)
-
-- Tải từ: https://nodejs.org/
-
-### 2. Chọn Package Manager
-
-Bạn có thể sử dụng một trong ba package manager sau:
-
-#### **pnpm** (phiên bản 10+) - KHUYẾN NGHỊ
-
-```bash
-npm install -g pnpm
-pnpm --version
-```
-
-#### **npm** (phiên bản 9+) - Mặc định với Node.js
-
-```bash
-npm --version
-```
-
-#### **yarn** (phiên bản 3+)
-
-```bash
-npm install -g yarn
-yarn --version
-```
-
-### Kiểm Tra Cài Đặt
-
-```bash
-node --version
-pnpm --version  # hoặc: npm --version, yarn --version
-```
+- Node.js >= 22
+- MongoDB
+- pnpm / npm / yarn
 
 ---
 
-## 🚀 Hướng Dẫn Nhanh Chạy Backend
+## ⚡ Chạy Nhanh Dự Án
 
-### Bước 1: Cài Đặt Thư Viện
-
-Từ thư mục `template-backend`:
-
-**Với pnpm (khuyến nghị):**
+### 1. Cài đặt thư viện
 
 ```bash
 pnpm install
 ```
 
-**Với npm:**
+> Có thể thay bằng `npm install` hoặc `yarn install`
 
-```bash
-npm install
-```
+---
 
-**Với yarn:**
+### 2. Cấu hình biến môi trường
 
-```bash
-yarn install
-```
+Tạo file `.env` từ file `.env.example`
 
-### Bước 2: Cấu Hình Biến Môi Trường
-
-1. **Tạo file `.env`** từ file example:
-
-**Với Linux/macOS:**
+#### Linux/macOS
 
 ```bash
 cp .env.example .env
 ```
 
-**Với Windows PowerShell:**
+#### Windows PowerShell
 
-```bash
+```powershell
 Copy-Item .env.example .env
 ```
 
-2. **Chỉnh sửa file `.env`** và điền các giá trị cần thiết
+Sau đó điền các giá trị cần thiết vào file `.env`.
 
-## ▶️ Chạy Ứng Dụng Backend
+---
 
-**Với pnpm:**
-
-```bash
-pnpm run dev
-```
-
-**Với npm:**
+### 3. Chạy server development
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
-**Với yarn:**
+Backend sẽ chạy tại:
+
+```txt
+http://localhost:3000
+```
+
+---
+
+## 📦 Các Script Có Sẵn
 
 ```bash
-yarn dev
+pnpm dev      # chạy môi trường development
+pnpm build    # build project
+pnpm start    # chạy bản production
 ```
 
-Xong! 🎉 Backend sẽ chạy tại **http://localhost:3000**
+---
+
+## 🛠️ Công Nghệ Sử Dụng
+
+- TypeScript
+- Express.js
+- MongoDB
+- Mongoose
+
+---
+
+## 🔐 Biến Môi Trường
+
+Ví dụ file `.env`:
+
+```env
+PORT=3000
+NODE_ENV=development
+CORS_ORIGIN=your_cors_origin_here
+
+# MongoDB
+MONGODB_URI=your_mongodb_uri_here
+GEMINI_API_KEY=your_gemini_api_key_here
+# GEMINI_MODEL=gemini-3-flash-preview
+GEMINI_MODEL=your_gemini_model_here
+JWT_SECRET=your_jwt_secret_here
+JWT_EXPIRES_IN=7d
+```
