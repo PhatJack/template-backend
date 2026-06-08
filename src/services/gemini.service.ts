@@ -80,6 +80,11 @@ export type GeminiFileReference = {
   mimeType: string;
 };
 
+export type GeminiHistoryMessage = {
+  role: "user" | "model";
+  parts: [{ text: string }];
+};
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function waitForActiveFile(file: GeminiFile): Promise<GeminiFile> {
@@ -148,7 +153,35 @@ export async function uploadAttachmentToGemini(
 function createGeminiContents(
   prompt: string,
   files: GeminiFileReference[],
+  history: GeminiHistoryMessage[] = [],
 ) {
+  if (history.length > 0) {
+    const contents = history.map((message) => ({
+      ...message,
+      parts: [...message.parts] as Part[],
+    }));
+
+    if (files.length === 0) {
+      return contents;
+    }
+
+    const lastUserMessage = [...contents]
+      .reverse()
+      .find((message) => message.role === "user");
+
+    if (lastUserMessage) {
+      lastUserMessage.parts.push(
+        ...files.map<Part>((file) => ({
+          fileData: {
+            fileUri: file.uri,
+            mimeType: file.mimeType,
+          },
+        })),
+      );
+      return contents;
+    }
+  }
+
   if (files.length === 0) {
     return prompt;
   }
@@ -172,11 +205,12 @@ function createGeminiContents(
 export async function generateGeminiReply(
   prompt: string,
   attachments: GeminiAttachment[] = [],
+  history: GeminiHistoryMessage[] = [],
 ): Promise<GeminiReply> {
   const uploadedFiles = attachments.length
     ? await Promise.all(attachments.map(uploadAttachmentToGemini))
     : [];
-  const contents = createGeminiContents(prompt, uploadedFiles);
+  const contents = createGeminiContents(prompt, uploadedFiles, history);
 
   let response: Awaited<
     ReturnType<ReturnType<typeof getClient>["models"]["generateContent"]>
@@ -216,8 +250,9 @@ export async function generateGeminiReply(
 export async function* streamGeminiReply(
   prompt: string,
   files: GeminiFileReference[] = [],
+  history: GeminiHistoryMessage[] = [],
 ): AsyncGenerator<string> {
-  const contents = createGeminiContents(prompt, files);
+  const contents = createGeminiContents(prompt, files, history);
   const response = await getClient().models.generateContentStream({
     model: getGeminiModel(),
     contents,

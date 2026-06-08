@@ -3,13 +3,14 @@ import {
   MessageModel,
   type MessageRecord,
   type MessageInput,
+  type MessageRole,
 } from "../models/message.model.js";
 import { FileResponse, toFileResponse } from "./file.repository.js";
 
 export type MessageResponse = {
   id: string;
   conversationId: string;
-  role: string;
+  role: MessageRole;
   content: string;
   createdAt: Date;
 };
@@ -69,6 +70,18 @@ export async function listByConversation(
 export async function getMessage(id: string): Promise<MessageResponse | null> {
   const message = await MessageModel.findById(id).lean<MessageRecord | null>();
   return message ? toMessageResponse(message) : null;
+}
+
+export async function listRecentConversationMessages(
+  conversationId: string,
+  limit = 10,
+): Promise<MessageResponse[]> {
+  const messages = await MessageModel.find({ conversationId })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean<MessageRecord[]>();
+
+  return messages.reverse().map(toMessageResponse);
 }
 
 export async function createMessage(

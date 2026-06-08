@@ -168,7 +168,7 @@ const swaggerDefinition = {
           },
           role: {
             type: "string",
-            enum: ["USER", "ASSISTANT", "SYSTEM"],
+            enum: ["USER", "ASSISTANT"],
             example: "USER",
           },
           content: { type: "string", example: "Hello" },
@@ -185,7 +185,7 @@ const swaggerDefinition = {
           },
           role: {
             type: "string",
-            enum: ["USER", "ASSISTANT", "SYSTEM"],
+            enum: ["USER", "ASSISTANT"],
             example: "USER",
           },
           content: { type: "string", example: "Hello" },

@@ -1,6 +1,6 @@
 import { Schema, model, type Types } from "mongoose";
 
-export type MessageRole = "USER" | "ASSISTANT" | "SYSTEM";
+export type MessageRole = "USER" | "ASSISTANT";
 
 export type MessageInput = {
   conversationId: Types.ObjectId | string;
@@ -17,7 +17,7 @@ export type MessageRecord = MessageInput & {
 const messageSchema = new Schema<MessageInput>(
   {
     conversationId: { type: Schema.Types.ObjectId, ref: "Conversation", required: true },
-    role: { type: String, enum: ["USER", "ASSISTANT", "SYSTEM"], required: true },
+    role: { type: String, enum: ["USER", "ASSISTANT"], required: true },
     content: { type: String, required: true }
   },
   { timestamps: true, versionKey: false }

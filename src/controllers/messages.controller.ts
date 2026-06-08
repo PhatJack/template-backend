@@ -2,14 +2,17 @@ import type { NextFunction, Request, Response } from "express";
 import fs from "node:fs/promises";
 import {
   listByConversation,
+  listRecentConversationMessages,
   createMessage,
   getMessage,
+  type MessageResponse,
 } from "../repositories/message.repository.js";
 import { createFile, listByMessage } from "../repositories/file.repository.js";
 import {
   generateGeminiReply,
   getGeminiReplyModel,
   streamGeminiReply,
+  type GeminiHistoryMessage,
 } from "../services/gemini.service.js";
 import {
   getSupportedGeminiMimeTypes,
@@ -31,6 +34,18 @@ function getUploadedFiles(req: Request): Express.Multer.File[] {
 
 async function cleanupUploadedFiles(files: Express.Multer.File[]): Promise<void> {
   await Promise.allSettled(files.map((file) => fs.unlink(file.path)));
+}
+
+function toGeminiHistory(messages: MessageResponse[]): GeminiHistoryMessage[] {
+  return messages.reduce<GeminiHistoryMessage[]>((history, message) => {
+    if (message.role === "USER") {
+      history.push({ role: "user", parts: [{ text: message.content }] });
+      return history;
+    }
+
+    history.push({ role: "model", parts: [{ text: message.content }] });
+    return history;
+  }, []);
 }
 
 export async function listMessages(
@@ -117,12 +132,16 @@ export async function generateMessageHandler(
       });
     }
 
+    const recentMessages = await listRecentConversationMessages(
+      sourceMessage.conversationId,
+    );
     const geminiReply = await generateGeminiReply(
       sourceMessage.content,
       uploadedFiles.map((file) => ({
         path: file.path,
         mimeType: file.mimetype,
       })),
+      toGeminiHistory(recentMessages),
     );
     const assistantMessage = await createMessage({
       conversationId: sourceMessage.conversationId,
@@ -206,6 +225,9 @@ export async function streamMessageHandler(
 
     try {
       const sourceFiles = await listByMessage(sourceMessage.id);
+      const recentMessages = await listRecentConversationMessages(
+        sourceMessage.conversationId,
+      );
 
       for await (const text of streamGeminiReply(
         sourceMessage.content,
@@ -213,6 +235,7 @@ export async function streamMessageHandler(
           uri: file.url,
           mimeType: file.mimeType,
         })),
+        toGeminiHistory(recentMessages),
       )) {
         if (clientClosed || res.writableEnded) {
           return;
